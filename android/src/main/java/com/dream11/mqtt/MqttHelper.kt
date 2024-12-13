@@ -5,10 +5,10 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import com.hivemq.client.mqtt.MqttClientState
 import com.hivemq.client.mqtt.datatypes.MqttQos
-import com.hivemq.client.mqtt.mqtt5.Mqtt5Client
-import com.hivemq.client.mqtt.mqtt5.Mqtt5RxClient
-import com.hivemq.client.mqtt.mqtt5.exceptions.Mqtt5ConnAckException
-import com.hivemq.client.mqtt.mqtt5.exceptions.Mqtt5DisconnectException
+import com.hivemq.client.mqtt.mqtt3.Mqtt3Client
+import com.hivemq.client.mqtt.mqtt3.Mqtt3RxClient
+import com.hivemq.client.mqtt.mqtt3.exceptions.Mqtt3ConnAckException
+import com.hivemq.client.mqtt.mqtt3.exceptions.Mqtt3DisconnectException
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 
@@ -19,7 +19,7 @@ class MqttHelper(
     enableSslConfig: Boolean,
     private val emitJsiEvent: (eventId: String, payload: WritableMap) -> Unit
 ) {
-    private lateinit var mqtt: Mqtt5RxClient
+    private lateinit var mqtt: Mqtt3RxClient
     private val subscriptionMap: HashMap<String, HashMap<String, Subscription>> = HashMap()
 
     companion object {
@@ -38,17 +38,17 @@ class MqttHelper(
     init {
         Log.d("MQTT init", "clientid " + clientId + "host "+ host + "port "+ port)
         try {
-            val client = Mqtt5Client.builder()
+            val client = Mqtt3Client.builder()
                 .identifier(clientId)
                 .addDisconnectedListener { disconnectedContext ->
                     val connPayload = try {
-                        (disconnectedContext.cause as Mqtt5ConnAckException?)?.mqttMessage?.reasonCode?.code
+                        (disconnectedContext.cause as Mqtt3ConnAckException?)?.mqttMessage?.returnCode?.code
                     } catch (e: Exception) {
                         null
                     }
 
                     val disconnectPayload = try {
-                        (disconnectedContext.cause as Mqtt5DisconnectException).mqttMessage.reasonCode.code
+                        (disconnectedContext.cause as Mqtt3DisconnectException?)?.mqttMessage.hashCode()
                     } catch (e: Exception) {
                         null
                     }
@@ -95,14 +95,14 @@ class MqttHelper(
       Log.d("MQTT Connect called", "username " + options.username)
          val disposable: Disposable = mqtt.connectWith()
             .keepAlive(options.keepAlive)
-            .cleanStart(options.cleanSession)
+            .cleanSession(options.cleanSession)
             .simpleAuth()
             .username(options.username)
             .password(options.password)
             .applySimpleAuth()
             .applyConnect()
             .doOnSuccess { ack ->
-                Log.d("MQTT Connect", "" + ack.reasonString)
+                Log.d("MQTT Connect", "" + ack.toString())
                 for ((topic, eventIdMap) in subscriptionMap) {
                     for ((eventId, subscription) in eventIdMap) {
                         subscription.disposable.dispose()
@@ -160,10 +160,10 @@ class MqttHelper(
             .qos(MqttQos.fromCode(qos) ?: MqttQos.AT_MOST_ONCE)
             .applySubscribe()
             .doOnSingle { subAck ->
-                Log.e("MQTT Subscribe", "" + subAck.reasonString)
+                Log.e("MQTT Subscribe", "" + subAck.returnCodes.toString())
 
                 val params = Arguments.createMap().apply {
-                    putString("message", subAck.reasonString.toString())
+                    putString("message", subAck.returnCodes.toString())
                     putString("topic", topic) // TODO: get from mqtt client
                     putInt("qos", qos) // TODO: get from response
                 }
@@ -211,10 +211,10 @@ class MqttHelper(
             val disposable: Disposable = mqtt.unsubscribeWith()
                 .addTopicFilter(topic)
                 .applyUnsubscribe()
-                .doOnSuccess {  unsubAck ->
-                    // TODO: Replace with LogWrapper when available on bridge
-                    Log.e("MQTT Unsubscribe", "" + unsubAck.reasonString)
-                }
+                .doOnComplete {
+            // Unsubscribe success
+            Log.e("MQTT Unsubscribe", "Successfully unsubscribed from topic: $topic")
+          }
                 .doOnError { error ->
                     // TODO: Replace with LogWrapper when available on bridge
                     Log.e("MQTT Unsubscribe", "" + error.message)
