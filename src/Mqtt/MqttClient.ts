@@ -10,6 +10,7 @@ import type {
   MqttEventsInterface,
   MqttOptions,
   SubscribeMqtt,
+  PublishMqtt,
 } from './MqttClient.interface';
 import { EventEmitter } from './EventEmitter';
 import { getMqttBackoffTime } from './MqttClient.utils';
@@ -482,6 +483,18 @@ export class MqttClient {
    */
   getConnectionStatus() {
     return MqttJSIModule.getConnectionStatusMqtt(this.clientId);
+  }
+
+  /**
+   * Method to publish a message to an MQTT topic with the specified Quality of Service (QoS).
+   * @param topic The MQTT topic to publish the message to.
+   * @param message The message to be published to the topic.
+   * @param qos The Quality of Service level for the message (default is QoS 1).
+   * @param retain A boolean indicating whether the message should be retained by the broker (default is false).
+   */
+
+  publish({ topic, payload, qos = 1 }: PublishMqtt): string {
+    return MqttJSIModule.publishMqtt(this.clientId, topic, payload, qos);
   }
 
   /**

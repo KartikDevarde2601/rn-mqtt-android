@@ -51,6 +51,15 @@ export interface MqttEventsInterface {
   [MQTT_EVENTS.CLIENT_INITIALIZE_EVENT]: {
     clientInit: boolean;
   };
+  [MQTT_EVENTS.PUBLISH_SUCCESS_EVENT]: {
+    message: string;
+    topic: string;
+    qos: MqttQos;
+  };
+  [MQTT_EVENTS.PUBLISH_FAILED_EVENT]: {
+    topic: string;
+    errorMessage: string;
+  };
   [MQTT_EVENTS.ERROR_EVENT]: {
     clientInit: boolean;
     errorMessage: string;
@@ -75,6 +84,12 @@ export type SubscribeMqtt = {
   onError?: (
     error: MqttEventsInterface[MQTT_EVENTS.SUBSCRIPTION_FAILED_EVENT]
   ) => void;
+};
+
+export type PublishMqtt = {
+  topic: string;
+  qos?: MqttQos;
+  payload: string;
 };
 
 export type DisconnectCallback = {

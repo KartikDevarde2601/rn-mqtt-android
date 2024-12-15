@@ -2,6 +2,7 @@ package com.d11.rn.mqtt
 
 import android.util.Log
 import com.facebook.react.bridge.WritableMap
+import io.reactivex.Single
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -89,4 +90,14 @@ object MqttManager {
             "disconnected"
         }
     }
+
+  fun publishMqtt(clientId: String, topic: String, qos: Int, payload: String): Single<String>  {
+    val client = clientMap[clientId]
+    return if (client != null) {
+      client.publishMqtt(topic, qos, payload) // Synchronously publish using client
+    } else {
+      Log.w("MqttManager", "Unable to publish as the client for clientId: $clientId does not exist")
+      Single.just("Client Not Found for clientId: $clientId")
+    }
+  }
 }

@@ -1,5 +1,5 @@
 package com.d11.rn.mqtt
-
+import io.reactivex.Single
 import java.io.Serializable
 
 interface MqttModule {
@@ -9,4 +9,5 @@ interface MqttModule {
   fun subscribeMqtt(eventId: String, clientId: String, topic: String, qos: Integer)
   fun unsubscribeMqtt(eventId: String, clientId: String, topic: String)
   fun getConnectionStatusMqtt(clientId: String): String
+  fun publishMqtt(clientId: String, topic: String, qos: Integer,payload:String):Single<String>
 }

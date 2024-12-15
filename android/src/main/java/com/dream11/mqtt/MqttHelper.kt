@@ -7,10 +7,16 @@ import com.hivemq.client.mqtt.MqttClientState
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client
 import com.hivemq.client.mqtt.mqtt3.Mqtt3RxClient
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish
 import com.hivemq.client.mqtt.mqtt3.exceptions.Mqtt3ConnAckException
 import com.hivemq.client.mqtt.mqtt3.exceptions.Mqtt3DisconnectException
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3PublishResult
+import io.reactivex.Flowable
 import io.reactivex.Observer
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.CompletableFuture
 
 class MqttHelper(
     private val clientId: String,
@@ -29,6 +35,8 @@ class MqttHelper(
         const val SUBSCRIBE_SUCCESS = "subscribe_success"
         const val SUBSCRIBE_FAILED = "subscribe_failed"
         const val ERROR_EVENT = "mqtt_error"
+        const val PUBLISH_SUCCESS = "publish_success"
+        const val PUBLISH_FAILED = "publish_failed"
 
         const val CONNECTED = "connected"
         const val CONNECTING = "connecting"
@@ -234,7 +242,33 @@ class MqttHelper(
         }
     }
 
-    fun getConnectionStatusMqtt(): String {
+  fun publishMqtt(topic: String, qos: Int, payload: String): Single<String> {
+    val publishFlowable = Flowable.just(
+      Mqtt3Publish.builder()
+        .topic(topic)
+        .payload(payload.toByteArray(StandardCharsets.UTF_8))
+        .qos(MqttQos.fromCode(qos) ?: MqttQos.AT_MOST_ONCE)
+        .build()
+    )
+
+    return mqtt.publish(publishFlowable)
+      .firstOrError() // Convert Flowable to Single
+      .map { publishResult ->
+        val error = publishResult.error
+        if (error == null) {
+          "Message Published Successfully with Topic: ${publishResult.publish.topic}"
+        } else {
+          throw Exception("Failed to Publish Message: $error")
+        }
+      }
+      .onErrorResumeNext { throwable: Throwable ->
+        Single.error(Exception("Error during publish: ${throwable.message}", throwable))
+      }
+  }
+
+
+
+  fun getConnectionStatusMqtt(): String {
         return when(mqtt.state) {
             MqttClientState.CONNECTED -> {CONNECTED}
             MqttClientState.DISCONNECTED -> {DISCONNECTED}
