@@ -242,28 +242,26 @@ class MqttHelper(
         }
     }
 
-  fun publishMqtt(topic: String, qos: Int, payload: String): Single<String> {
-    val publishFlowable = Flowable.just(
-      Mqtt3Publish.builder()
-        .topic(topic)
-        .payload(payload.toByteArray(StandardCharsets.UTF_8))
-        .qos(MqttQos.fromCode(qos) ?: MqttQos.AT_MOST_ONCE)
-        .build()
+  fun publishMqtt(topic: String,payload: String,qos:Int) {
+    val publishFlowable = mqtt.publish(
+      Flowable.just(
+        Mqtt3Publish.builder()
+          .topic(topic)
+          .qos(MqttQos.fromCode(qos) ?: MqttQos.AT_MOST_ONCE)
+          .payload(payload.toByteArray(Charsets.UTF_8)) // Corrected this line
+          .build()
+      )
     )
 
-    return mqtt.publish(publishFlowable)
-      .firstOrError() // Convert Flowable to Single
-      .map { publishResult ->
-        val error = publishResult.error
-        if (error == null) {
-          "Message Published Successfully with Topic: ${publishResult.publish.topic}"
-        } else {
-          throw Exception("Failed to Publish Message: $error")
-        }
+    publishFlowable
+      .doOnComplete {
+        Log.e("MQTT PUBLISH", "Publish message successful") // Fixed Kotlin lambda syntax
       }
-      .onErrorResumeNext { throwable: Throwable ->
-        Single.error(Exception("Error during publish: ${throwable.message}", throwable))
+      .doOnError { throwable ->
+        Log.e("MQTT PUBLISH", "Publish message unsuccessful") // Fixed Kotlin lambda syntax
+        throwable.printStackTrace() // Print the error stack trace
       }
+      .subscribe() // Start the Flowable
   }
 
 

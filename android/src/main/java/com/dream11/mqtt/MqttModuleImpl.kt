@@ -8,8 +8,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.hivemq.client.mqtt.datatypes.MqttQos
-import io.reactivex.Single
 import java.io.Serializable
 
 @ReactModule(name = MqttModuleImpl.NAME)
@@ -106,7 +104,7 @@ class MqttModuleImpl(reactContext: ReactApplicationContext?) :
 
     override fun publishMqtt(clientId: String, topic: String, payload: String, qos: Integer) {
       Log.d("::::D11MQTT",":::: publishMQTT called via jsi bridge")
-        // return  MqttManager.publishMqtt(clientId,topic,qos.toInt(),payload)
+        return  MqttManager.publishMqtt(clientId,topic,payload,qos.toInt())
 
     }
 }
