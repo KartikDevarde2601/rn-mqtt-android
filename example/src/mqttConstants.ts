@@ -2,7 +2,7 @@ import { MqttConfig } from '../../src/Mqtt';
 
 export const mqttConfig: MqttConfig = {
   clientId: 'mqttx_d11_rn_mqtt',
-  host: '192.168.110.36',
+  host: '192.168.46.36',
   port: 1883,
   options: {
     password: '',

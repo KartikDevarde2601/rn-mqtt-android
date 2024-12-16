@@ -32,9 +32,9 @@ export interface MqttModuleProxy {
   publishMqtt: (
     clientId: string,
     topic: string,
-    message: string,
+    payload: string,
     qos: 0 | 1 | 2
-  ) => string;
+  ) => void;
 }
 
 declare global {

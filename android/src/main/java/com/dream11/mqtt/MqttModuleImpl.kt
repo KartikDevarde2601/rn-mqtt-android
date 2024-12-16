@@ -104,9 +104,9 @@ class MqttModuleImpl(reactContext: ReactApplicationContext?) :
 
     }
 
-    override fun publishMqtt(clientId: String,topic: String,qos: Integer,payload:String):Single<String>{
+    override fun publishMqtt(clientId: String, topic: String, payload: String, qos: Integer) {
       Log.d("::::D11MQTT",":::: publishMQTT called via jsi bridge")
-        return  MqttManager.publishMqtt(clientId,topic,qos.toInt(),payload)
+        // return  MqttManager.publishMqtt(clientId,topic,qos.toInt(),payload)
 
     }
 }

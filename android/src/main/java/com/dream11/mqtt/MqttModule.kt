@@ -9,5 +9,5 @@ interface MqttModule {
   fun subscribeMqtt(eventId: String, clientId: String, topic: String, qos: Integer)
   fun unsubscribeMqtt(eventId: String, clientId: String, topic: String)
   fun getConnectionStatusMqtt(clientId: String): String
-  fun publishMqtt(clientId: String, topic: String, qos: Integer,payload:String):Single<String>
+  fun publishMqtt(clientId: String, topic: String, payload: String, qos: Integer)
 }

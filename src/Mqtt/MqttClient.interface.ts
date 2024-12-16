@@ -88,8 +88,8 @@ export type SubscribeMqtt = {
 
 export type PublishMqtt = {
   topic: string;
-  qos?: MqttQos;
   payload: string;
+  qos?: MqttQos;
 };
 
 export type DisconnectCallback = {

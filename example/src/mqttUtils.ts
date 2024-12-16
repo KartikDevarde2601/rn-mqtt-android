@@ -1,4 +1,4 @@
-import { SubscribeMqtt } from '../../src/Mqtt';
+import { SubscribeMqtt, PublishMqtt } from '../../src/Mqtt';
 
 export const subscriptionConfig: SubscribeMqtt = {
   topic: 'hello',
@@ -12,4 +12,10 @@ export const subscriptionConfig: SubscribeMqtt = {
   onError: (error) => {
     console.log('Subscription error:', error);
   },
+};
+
+export const publishConfig: PublishMqtt = {
+  topic: 'hello',
+  payload: 'Hello from react native',
+  qos: 1,
 };

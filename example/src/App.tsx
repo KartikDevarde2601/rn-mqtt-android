@@ -5,7 +5,7 @@ import { mqttConfig } from './mqttConstants';
 import { useEventListeners } from './useEventListeners';
 import { MqttClient } from '../../src/Mqtt/MqttClient';
 import { initializeMqttClient } from './createMqtt';
-import { subscriptionConfig } from './mqttUtils';
+import { subscriptionConfig, publishConfig } from './mqttUtils';
 
 export default function App() {
   const [mqttClient, setClient] = React.useState<MqttClient | undefined>(
@@ -42,6 +42,10 @@ export default function App() {
       mqttClient.remove();
       setClient(undefined);
     }
+  }, [mqttClient]);
+
+  const publishMqtt = React.useCallback(() => {
+    mqttClient?.publish(publishConfig);
   }, [mqttClient]);
 
   const getConnectionStatus = React.useCallback(() => {
@@ -81,6 +85,12 @@ export default function App() {
         onPress={removeMqtt}
         backgroundColor={'red'}
         buttonText="Remove Mqtt"
+        disabled={!mqttClient}
+      />
+      <RoundButton
+        onPress={publishMqtt}
+        backgroundColor={'#ff5959'}
+        buttonText="Publish Mqtt"
         disabled={!mqttClient}
       />
     </View>

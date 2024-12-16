@@ -493,8 +493,8 @@ export class MqttClient {
    * @param retain A boolean indicating whether the message should be retained by the broker (default is false).
    */
 
-  publish({ topic, payload, qos = 1 }: PublishMqtt): string {
-    return MqttJSIModule.publishMqtt(this.clientId, topic, payload, qos);
+  publish({ topic, qos = 1, payload }: PublishMqtt) {
+    MqttJSIModule.publishMqtt(this.clientId, topic, payload, qos);
   }
 
   /**
