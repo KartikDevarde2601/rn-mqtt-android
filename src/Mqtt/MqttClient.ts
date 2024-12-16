@@ -18,6 +18,7 @@ import { MqttJSIModule } from '../Modules/mqttModule';
 import { NativeModules } from 'react-native';
 
 const { MqttModule } = NativeModules;
+
 /**
  * MqttClient class represents an MQTT client with functionalities for connection management, event handling, and message subscription.
  * It interfaces with the native MqttModule to perform MQTT operations.
@@ -493,8 +494,8 @@ export class MqttClient {
    * @param retain A boolean indicating whether the message should be retained by the broker (default is false).
    */
 
-  publish({ topic, qos = 1, payload }: PublishMqtt) {
-    MqttJSIModule.publishMqtt(this.clientId, topic, payload, qos);
+  publish({ topic, qos = 1, payload }: PublishMqtt): Promise<string> {
+    return MqttModule.publishMqtt(this.clientId, topic, payload, qos);
   }
 
   /**

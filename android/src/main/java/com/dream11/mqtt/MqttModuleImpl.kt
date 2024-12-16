@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import io.reactivex.disposables.CompositeDisposable
 import java.io.Serializable
 
 @ReactModule(name = MqttModuleImpl.NAME)
@@ -30,8 +31,9 @@ class MqttModuleImpl(reactContext: ReactApplicationContext?) :
     }
 
     private external fun nativeInstallJSIBindings(runtimePtr: Long)
+    private val compositeDisposable = CompositeDisposable()
 
-    private external fun nativeMultiply(a: Int, b: Int): Int
+  private external fun nativeMultiply(a: Int, b: Int): Int
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     fun installJSIModule(): Boolean {
@@ -102,9 +104,18 @@ class MqttModuleImpl(reactContext: ReactApplicationContext?) :
 
     }
 
-    override fun publishMqtt(clientId: String, topic: String, payload: String, qos: Integer) {
-      Log.d("::::D11MQTT",":::: publishMQTT called via jsi bridge")
-        return  MqttManager.publishMqtt(clientId,topic,payload,qos.toInt())
+  @ReactMethod
+  override fun publishMqtt(clientId: String, topic: String, payload: String, qos: Integer, promise: Promise) {
+    Log.d("::::D11MQTT", ":::: publishMQTT called via JSI bridge")
 
-    }
+    val disposable = MqttManager.publishMqtt(clientId, topic, payload, qos.toInt())
+      .subscribe({ result ->
+        promise.resolve(result) // Resolving the promise on success
+      }, { error ->
+        promise.reject("PUBLISH_MQTT_ERROR", error.message, error) // Rejecting the promise on error
+      })
+
+    compositeDisposable.add(disposable)
+  }
+
 }
