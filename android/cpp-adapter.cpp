@@ -576,14 +576,6 @@ static jsi::Value getConnectionStatusMqtt(jsi::Runtime &runtime, const jsi::Valu
     return retVal;
 }
 
-static jsi::Value publishMqtt(jsi::Runtime &runtime, const jsi::Value &thisValue,
-                              const jsi::Value *arguments, std::size_t count)
-{
-    jsi::Value retVal = executeJNIFunction(runtime, thisValue, arguments, count,
-                                           "publishMqtt", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)V",
-                                           true, java_mqtt_object);
-    return retVal;
-}
 
 static void installMqttJSIModule(jsi::Runtime &jsiRuntime)
 {
@@ -597,7 +589,7 @@ static void installMqttJSIModule(jsi::Runtime &jsiRuntime)
     addGlobalHostFunction(jsiRuntime, module, "subscribeMqtt", 4, subscribeMqtt);
     addGlobalHostFunction(jsiRuntime, module, "unsubscribeMqtt", 3, unsubscribeMqtt);
     addGlobalHostFunction(jsiRuntime, module, "getConnectionStatusMqtt", 1, getConnectionStatusMqtt);
-    addGlobalHostFunction(jsiRuntime, module, "publishMqtt", 4, publishMqtt);
+
 
     jsiRuntime.global().setProperty(jsiRuntime, "__MqttModuleProxy", std::move(module));
 }

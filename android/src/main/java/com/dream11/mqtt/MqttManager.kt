@@ -2,6 +2,7 @@ package com.d11.rn.mqtt
 
 import android.util.Log
 import com.facebook.react.bridge.WritableMap
+import io.reactivex.Single
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -105,17 +106,24 @@ object MqttManager {
     }
   }
 
-  fun publishMqtt(clientId: String, topic: String, payload: String, qos: Int) {
-    executor.submit {
-      val client = clientMap[clientId]
-      if (client != null) {
-        client.publishMqtt(topic,payload,qos)
-      } else {
-        Log.w(
-          "MqttManager",
-          "unable to subscribe as the client for clientId: $clientId does not exist"
-        )
+  fun publishMqtt(clientId: String, topic: String, payload: String, qos: Int): Single<String> {
+    return Single.create { emitter ->
+      executor.submit {
+        val client = clientMap[clientId]
+        if (client != null) {
+          try {
+            val result = client.publishMqtt(topic, payload, qos).blockingGet()
+            emitter.onSuccess(result) // Emit the result if successful
+          } catch (e: Exception) {
+            emitter.onError(e) // Emit an error if an exception occurs
+          }
+        } else {
+          val errorMessage = "Unable to publish as the client for clientId: $clientId does not exist"
+          Log.w("MqttManager", errorMessage)
+          emitter.onError(Exception(errorMessage)) // Emit an error for missing client
+        }
       }
     }
   }
+
 }

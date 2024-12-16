@@ -2,6 +2,7 @@ package com.d11.rn.mqtt
 
 import android.util.Log
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.WritableMap
 import com.hivemq.client.mqtt.MqttClientState
 import com.hivemq.client.mqtt.datatypes.MqttQos
@@ -242,27 +243,32 @@ class MqttHelper(
         }
     }
 
-  fun publishMqtt(topic: String,payload: String,qos:Int) {
-    val publishFlowable = mqtt.publish(
+  fun publishMqtt(topic: String, payload: String, qos: Int): Single<String> {
+    return mqtt.publish(
       Flowable.just(
         Mqtt3Publish.builder()
           .topic(topic)
           .qos(MqttQos.fromCode(qos) ?: MqttQos.AT_MOST_ONCE)
-          .payload(payload.toByteArray(Charsets.UTF_8)) // Corrected this line
+          .payload(payload.toByteArray(Charsets.UTF_8))
           .build()
       )
     )
-
-    publishFlowable
-      .doOnComplete {
-        Log.e("MQTT PUBLISH", "Publish message successful") // Fixed Kotlin lambda syntax
+      .ignoreElements() // Converting Flowable to Completable
+      .andThen(Single.just(
+        "Topic: $topic - Status: success"
+      )) // Emit success message
+      .doOnSuccess { result ->
+        // Log success
+        Log.d("MQTT", "Publish successful: $result")
       }
-      .doOnError { throwable ->
-        Log.e("MQTT PUBLISH", "Publish message unsuccessful") // Fixed Kotlin lambda syntax
-        throwable.printStackTrace() // Print the error stack trace
+      .onErrorReturn { throwable ->
+        // Log error
+        Log.e("MQTT", "Publish failed for topic $topic: ${throwable.message}", throwable)
+        "Topic: $topic - Error: ${throwable.message}" // Emit error message
       }
-      .subscribe() // Start the Flowable
   }
+
+
 
 
 

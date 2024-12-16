@@ -15,7 +15,7 @@ export const subscriptionConfig: SubscribeMqtt = {
 };
 
 export const publishConfig: PublishMqtt = {
-  topic: 'hello',
+  topic: 'kartik',
   payload: 'Hello from react native',
   qos: 1,
 };

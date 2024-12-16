@@ -34,7 +34,7 @@ export interface MqttModuleProxy {
     topic: string,
     payload: string,
     qos: 0 | 1 | 2
-  ) => void;
+  ) => Promise<void>;
 }
 
 declare global {

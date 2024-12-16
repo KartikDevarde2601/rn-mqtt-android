@@ -45,7 +45,9 @@ export default function App() {
   }, [mqttClient]);
 
   const publishMqtt = React.useCallback(() => {
-    mqttClient?.publish(publishConfig);
+    mqttClient?.publish(publishConfig).then((result) => {
+      console.log(`::MQTT publish result:${result}`);
+    });
   }, [mqttClient]);
 
   const getConnectionStatus = React.useCallback(() => {
