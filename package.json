@@ -1,7 +1,6 @@
 {
-  "name": "rn-mqtt-android",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@kartik2601/rn-mqtt-android",
+  "version": "0.0.2",
   "description": "React native support for using mqtt",
   "module": "dist/Modules/mqtt-modules.js",
   "main": "dist/index.js",
@@ -39,13 +38,16 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/dream-sports-labs/d11-react-native-mqtt.git",
-  "author": "Dream Sports Labs <dreamsportslabs@dream11.com> (https://github.com/dream-sports-labs)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KartikDevarde2601/rn-mqtt-android.git"
+  },
+  "author": "Kartik Devarde <kartikdevarde@outlook.com> (https://github.com/KartikDevarde2601)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dream-sports-labs/d11-react-native-mqtt.git/issues"
+    "url": "https://github.com/KartikDevarde2601/rn-mqtt-android.git/issues"
   },
-  "homepage": "https://github.com/dream-sports-labs/d11-react-native-mqtt.git#readme",
+  "homepage": "https://github.com/KartikDevarde2601/rn-mqtt-android.git#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
