@@ -1,6 +1,7 @@
 {
-  "name": "@d11/react-native-mqtt",
-  "version": "0.0.3",
+  "name": "rn-mqtt-android",
+  "version": "0.0.1",
+  "private": true,
   "description": "React native support for using mqtt",
   "module": "dist/Modules/mqtt-modules.js",
   "main": "dist/index.js",
